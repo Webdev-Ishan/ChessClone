@@ -82,10 +82,21 @@ if(chess.turn('B') && uniquesocket.id!== players.black) return;
 // it means if it is black turn and white is moving then its piece would came back to original place
     
 const result= chess.move(move); // it holds the result valid or not, we will handle it further
-
-
+// if move is right
+if(result){
+    currentplayer= chess.turn(); // change the turn of the player
+    io.emit("move",move); // send the new move to all
+    io.emit("boardstate",chess.fen()); // this will send the current boardstate to all
+    // fen() is an inbuilt equation to tell the  state of all the pawns on chessboard
+}
+// else when result is wrong
+else{
+    // send the invalid move message to only the person who make the move, so use uniquesocket
+    uniquesocket.emit("invalidmove: ", move);
+}
 } catch (error) {
-        
+// if there is any error then send the error message to the person who made the move
+        io.emit("Something went wrong");
     }
   })
 })

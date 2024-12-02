@@ -1,3 +1,5 @@
+
+
 const socket = io(); // Connect various front ends to the backend socket.io setup
 
 // socket.emit("Hare Krishna");
@@ -78,8 +80,13 @@ const renderBoard = () => {
     });
 };
 
-const handleMove = () => {
+const handleMove = (source, target) => {
     // To handle moves
+    const move={
+        from: `${String.fromCharCode(97+ source.col) }${8-source.row}`,
+        to: `${String.fromCharCode(97+ source.col) }${8-target.row}`
+    }
+    socket.emit('move', move);
 };
 
 const getPieceUnicode = (piece1) => {
@@ -93,5 +100,25 @@ const getPieceUnicode = (piece1) => {
 
     
 };
+
+socket.on('playerRole', (role)=>{
+playerRole=role;
+renderBoard();
+});
+
+socket.on('spectatorRole', ()=>{
+    playerRole=null;
+    renderBoard();
+});
+
+socket.on('boardState',(fen)=>{
+chess.load(fen);
+renderBoard();
+});
+
+socket.on('move',(move)=>{
+    chess.move(move);
+    renderBoard();
+});
 
 renderBoard();
